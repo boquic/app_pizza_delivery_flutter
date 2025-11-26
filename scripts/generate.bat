@@ -1,6 +1,21 @@
 @echo off
-echo Generando codigo con build_runner...
-flutter pub run build_runner build --delete-conflicting-outputs
+echo ========================================
+echo   Generando codigo Freezed...
+echo ========================================
 echo.
-echo Generacion completada!
+
+call flutter pub run build_runner build --delete-conflicting-outputs
+
+if %errorlevel% neq 0 (
+    echo.
+    echo ERROR: Fallo al generar codigo
+    pause
+    exit /b %errorlevel%
+)
+
+echo.
+echo ========================================
+echo   Codigo generado exitosamente!
+echo ========================================
+echo.
 pause

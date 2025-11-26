@@ -73,9 +73,23 @@ lib/
 - Flutter SDK 3.19 o superior
 - Dart SDK 3.2 o superior
 - Android Studio / VS Code con extensiones de Flutter
-- Cuenta de Google Cloud (para Google Maps API)
+- Backend Spring Boot corriendo en puerto 8080
 
-### Instalación
+### Instalación Rápida (Windows)
+
+Ejecuta el script de setup automático:
+
+```bash
+scripts\setup.bat
+```
+
+Este script:
+1. Instala las dependencias
+2. Genera el código Freezed
+3. Crea el archivo `.env` si no existe
+4. Verifica la configuración
+
+### Instalación Manual
 
 1. **Clonar el repositorio**
 
@@ -92,39 +106,65 @@ flutter pub get
 
 3. **Configurar variables de entorno**
 
-Copia el archivo `.env.example` a `.env` y configura las variables:
+Copia el archivo `.env.example` a `.env`:
 
 ```bash
-cp .env.example .env
+# Windows (CMD)
+copy .env.example .env
+
+# Windows (PowerShell)
+Copy-Item .env.example .env
 ```
 
-Edita `.env` con tus credenciales:
+Edita `.env` según tu entorno:
 
 ```env
-API_BASE_URL=https://api.pizzasreyna.com/api/v1
-WS_URL=wss://api.pizzasreyna.com/ws
+# Desarrollo Local (iOS Simulator)
+API_BASE_URL=http://localhost:8080
+WS_URL=ws://localhost:8080/ws
+
+# Desarrollo Local (Android Emulator)
+# API_BASE_URL=http://10.0.2.2:8080
+# WS_URL=ws://10.0.2.2:8080/ws
+
+# Producción
+# API_BASE_URL=https://api.pizzasreyna.com
+# WS_URL=wss://api.pizzasreyna.com/ws
+
 GOOGLE_MAPS_API_KEY=tu_api_key_aqui
 ENVIRONMENT=dev
 ```
 
-4. **Generar código**
+4. **Generar código Freezed**
 
 ```bash
 flutter pub run build_runner build --delete-conflicting-outputs
+
+# O usa el script de Windows
+scripts\generate.bat
 ```
 
-5. **Ejecutar la aplicación**
+5. **Verificar que el backend esté corriendo**
+
+Asegúrate de que tu backend Spring Boot esté corriendo en `http://localhost:8080`
+
+6. **Ejecutar la aplicación**
 
 ```bash
-# Modo desarrollo
-flutter run --flavor dev
-
-# Modo staging
-flutter run --flavor staging
-
-# Modo producción
-flutter run --flavor prod --release
+flutter run
 ```
+
+### 📚 Documentación Adicional
+
+- **[CAMBIOS_BACKEND.md](CAMBIOS_BACKEND.md)** - Resumen completo de cambios realizados
+- **[API_INTEGRATION.md](API_INTEGRATION.md)** - Documentación de integración con API
+- **[SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)** - Instrucciones detalladas paso a paso
+
+### 🔐 Credenciales de Prueba
+
+**Usuario Admin:**
+- Email: `admin@pizzasreyna.com`
+- Password: `admin123`
 
 ## 🧪 Testing
 
