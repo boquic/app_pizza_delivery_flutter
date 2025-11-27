@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../providers/cart_provider.dart';
@@ -57,7 +57,7 @@ class CartPage extends ConsumerWidget {
         title: 'Carrito vacío',
         message: 'Agrega pizzas deliciosas a tu carrito',
         action: ElevatedButton(
-          onPressed: () => context.go('/catalog'),
+          onPressed: () => Navigator.pop(context),
           child: const Text('Ver Catálogo'),
         ),
       );
@@ -73,9 +73,7 @@ class CartPage extends ConsumerWidget {
           final item = cartState.cart!.items[index];
           return CartItemWidget(
             item: item,
-            onRemove: () {
-              ref.read(cartProvider.notifier).removeItem(item.id);
-            },
+            onRemove: () => _showRemoveItemDialog(context, ref, item),
           );
         },
       ),
@@ -166,7 +164,14 @@ class CartPage extends ConsumerWidget {
               width: double.infinity,
               height: 50,
               child: FilledButton(
-                onPressed: () => context.push('/checkout'),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Función de pago en desarrollo'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
                 child: const Text(
                   'Proceder al Pago',
                   style: TextStyle(
@@ -178,6 +183,59 @@ class CartPage extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showRemoveItemDialog(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic item,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar Item'),
+        content: Text(
+          '¿Deseas eliminar "${item.pizzaNombre ?? item.comboNombre ?? 'este item'}" del carrito?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              try {
+                await ref.read(cartProvider.notifier).removeItem(item.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Item eliminado del carrito'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error al eliminar: ${e.toString().replaceAll('Exception: ', '')}'),
+                      backgroundColor: Colors.red,
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('Eliminar'),
+          ),
+        ],
       ),
     );
   }

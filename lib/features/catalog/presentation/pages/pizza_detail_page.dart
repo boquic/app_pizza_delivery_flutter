@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/price_indicator.dart';
+import '../../../../core/widgets/success_dialog.dart';
 import '../../../auth/presentation/pages/login_page.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../cart/presentation/pages/cart_page.dart';
@@ -275,28 +276,40 @@ class _PizzaDetailPageState extends ConsumerState<PizzaDetailPage> {
     );
   }
 
-  void _addToCart(Pizza pizza) {
-    ref.read(cartProvider.notifier).addItem(
+  Future<void> _addToCart(Pizza pizza) async {
+    final success = await ref.read(cartProvider.notifier).addItem(
           pizzaId: pizza.id,
           cantidad: _quantity,
         );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${pizza.nombre} agregado al carrito'),
-        action: SnackBarAction(
-          label: 'Ver carrito',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CartPage(),
-              ),
-            );
-          },
+    if (!mounted) return;
+
+    if (success) {
+      // Mostrar popup de éxito
+      await SuccessDialog.show(
+        context,
+        title: '¡Agregado al Carrito!',
+        message: '${pizza.nombre} se agregó correctamente a tu carrito',
+        icon: Icons.shopping_cart_outlined,
+      );
+    } else {
+      final cartState = ref.read(cartProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            cartState.error ?? 'Error al agregar al carrito',
+          ),
+          backgroundColor: AppColors.error,
+          action: SnackBarAction(
+            label: 'Cerrar',
+            textColor: Colors.white,
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            },
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   void _showLoginDialog() {

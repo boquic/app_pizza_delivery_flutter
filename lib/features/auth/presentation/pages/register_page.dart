@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../../core/widgets/success_dialog.dart';
 import '../providers/auth_provider.dart';
 
 /// Pantalla de registro de nuevos usuarios
@@ -18,6 +19,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _telefonoController = TextEditingController();
+  final _direccionController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -28,6 +31,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     _apellidoController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _telefonoController.dispose();
+    _direccionController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
@@ -39,20 +44,26 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     try {
       await ref.read(authProvider.notifier).register(
-            '${_nombreController.text} ${_apellidoController.text}',
-            _emailController.text,
+            _nombreController.text.trim(),
+            _apellidoController.text.trim(),
+            _emailController.text.trim(),
             _passwordController.text,
+            telefono: _telefonoController.text.trim(),
+            direccion: _direccionController.text.trim(),
           );
 
       if (mounted) {
-        // Mostrar mensaje de éxito
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registro exitoso. Bienvenido!'),
-            backgroundColor: Colors.green,
-          ),
+        // Mostrar popup de bienvenida
+        await SuccessDialog.show(
+          context,
+          title: '¡Registro Exitoso!',
+          message: 'Tu cuenta ha sido creada correctamente. ¡Bienvenido!',
+          icon: Icons.account_circle,
+          onClose: () {
+            // Volver a la pantalla anterior (catálogo)
+            Navigator.pop(context);
+          },
         );
-        // El router redirigirá automáticamente al catálogo
       }
     } catch (e) {
       if (mounted) {
@@ -233,14 +244,62 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       ),
                     ),
                     obscureText: _obscureConfirmPassword,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _handleRegister(),
+                    textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor confirma tu contraseña';
                       }
                       if (value != _passwordController.text) {
                         return 'Las contraseñas no coinciden';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Campo Teléfono
+                  TextFormField(
+                    controller: _telefonoController,
+                    decoration: InputDecoration(
+                      labelText: 'Teléfono',
+                      prefixIcon: const Icon(Icons.phone_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingresa tu teléfono';
+                      }
+                      if (value.length < 9) {
+                        return 'El teléfono debe tener al menos 9 dígitos';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Campo Dirección
+                  TextFormField(
+                    controller: _direccionController,
+                    decoration: InputDecoration(
+                      labelText: 'Dirección',
+                      prefixIcon: const Icon(Icons.location_on_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => _handleRegister(),
+                    maxLines: 2,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingresa tu dirección';
+                      }
+                      if (value.length < 10) {
+                        return 'La dirección debe ser más específica';
                       }
                       return null;
                     },
@@ -283,7 +342,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         style: theme.textTheme.bodyMedium,
                       ),
                       TextButton(
-                        onPressed: () => context.go('/login'),
+                        onPressed: () => Navigator.pop(context),
                         child: const Text(
                           'Inicia Sesión',
                           style: TextStyle(fontWeight: FontWeight.bold),

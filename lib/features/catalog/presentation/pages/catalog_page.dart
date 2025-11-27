@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../auth/presentation/pages/login_page.dart';
+import '../../../auth/presentation/pages/profile_page.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../cart/presentation/pages/cart_page.dart';
 import '../../../cart/presentation/providers/cart_provider.dart';
@@ -59,6 +60,7 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
               );
             },
           ),
+          _buildAuthButton(),
           _buildCartButton(),
           const SizedBox(width: 8),
         ],
@@ -163,6 +165,43 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
     if (width > 1200) return 4;
     if (width > 800) return 3;
     return 2;
+  }
+
+  Widget _buildAuthButton() {
+    final authState = ref.watch(authProvider);
+
+    if (authState.isAuthenticated) {
+      // Usuario autenticado - Mostrar botón de perfil
+      return IconButton(
+        icon: const Icon(Icons.person),
+        tooltip: 'Perfil',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProfilePage(),
+            ),
+          );
+        },
+      );
+    } else {
+      // Usuario no autenticado - Mostrar botón de login
+      return TextButton.icon(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LoginPage(),
+            ),
+          );
+        },
+        icon: const Icon(Icons.login, size: 20),
+        label: const Text('Ingresar'),
+        style: TextButton.styleFrom(
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        ),
+      );
+    }
   }
 
   Widget _buildCartButton() {

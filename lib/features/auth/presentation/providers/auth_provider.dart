@@ -84,15 +84,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> register(String nombre, String email, String password) async {
+  Future<void> register(
+    String nombre,
+    String apellido,
+    String email,
+    String password, {
+    String? telefono,
+    String? direccion,
+  }) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       final request = RegisterRequestModel(
         nombre: nombre,
-        apellido: '', // Por ahora vacío, se puede agregar campo en UI después
+        apellido: apellido,
         email: email,
         password: password,
+        telefono: telefono,
+        direccion: direccion,
       );
       final response = await _authDataSource.register(request);
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../../core/widgets/success_dialog.dart';
 import '../providers/auth_provider.dart';
+import 'register_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -33,20 +35,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡Bienvenido!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
+        // Mostrar popup de bienvenida
+        await SuccessDialog.show(
+          context,
+          title: '¡Bienvenido!',
+          message: 'Has iniciado sesión correctamente',
+          icon: Icons.celebration,
+          onClose: () {
+            // Volver a la pantalla anterior (catálogo)
+            Navigator.pop(context);
+          },
         );
-        
-        // Navegar manualmente ya que el redirect puede no dispararse inmediatamente
-        if (context.canPop()) {
-          context.pop();
-        } else {
-          context.go('/catalog');
-        }
       }
     } catch (e) {
       if (mounted) {
@@ -242,7 +241,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               children: [
                                 const Text('¿No tienes cuenta? '),
                                 TextButton(
-                                  onPressed: () => context.go('/register'),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const RegisterPage(),
+                                      ),
+                                    );
+                                  },
                                   child: const Text(
                                     'Regístrate',
                                     style: TextStyle(

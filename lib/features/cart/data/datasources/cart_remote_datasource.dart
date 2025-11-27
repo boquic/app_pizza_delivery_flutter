@@ -41,10 +41,25 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   @override
   Future<CarritoModel> eliminarItem(int itemId) async {
     try {
+      print('🌐 DELETE /api/usuario/carrito/items/$itemId');
       final response = await dioClient.dio.delete('/api/usuario/carrito/items/$itemId');
-      return CarritoModel.fromJson(response.data);
+      print('📦 Response status: ${response.statusCode}');
+      print('📦 Response data: ${response.data}');
+      
+      if (response.data == null) {
+        throw Exception('Respuesta vacía del servidor');
+      }
+      
+      final carrito = CarritoModel.fromJson(response.data);
+      print('✅ Carrito parseado: ${carrito.items.length} items');
+      return carrito;
     } on DioException catch (e) {
+      print('❌ DioException: ${e.message}');
+      print('❌ Response: ${e.response?.data}');
       throw _handleError(e);
+    } catch (e) {
+      print('❌ Error inesperado: $e');
+      rethrow;
     }
   }
 
