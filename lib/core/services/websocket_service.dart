@@ -67,7 +67,8 @@ class WebSocketService {
   }
 
   void unsubscribeFromPedido(int pedidoId) {
-    _stompClient?.unsubscribe(destination: '/topic/pedidos/$pedidoId');
+    // La versión actual de stomp_dart_client no soporta unsubscribe individual
+    // Se desconectará cuando se llame a disconnect()
   }
 
   void disconnect() {

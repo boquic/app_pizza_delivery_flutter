@@ -19,7 +19,7 @@ class PizzaCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: pizza.isAvailable ? onTap : null,
+        onTap: pizza.disponible ? onTap : null,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -29,25 +29,34 @@ class PizzaCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: pizza.imageUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: AppColors.surfaceVariant,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: AppColors.surfaceVariant,
-                      child: const Icon(
-                        Icons.local_pizza,
-                        size: 48,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                  if (!pizza.isAvailable)
+                  pizza.imagenUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: pizza.imagenUrl!,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: AppColors.surfaceVariant,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: AppColors.surfaceVariant,
+                            child: const Icon(
+                              Icons.local_pizza,
+                              size: 48,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        )
+                      : Container(
+                          color: AppColors.surfaceVariant,
+                          child: const Icon(
+                            Icons.local_pizza,
+                            size: 48,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                  if (!pizza.disponible)
                     Container(
                       color: Colors.black54,
                       child: const Center(
@@ -60,7 +69,7 @@ class PizzaCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  // Rating badge
+                  // Tamaño badge
                   Positioned(
                     top: 8,
                     right: 8,
@@ -73,24 +82,13 @@ class PizzaCard extends StatelessWidget {
                         color: Colors.black87,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Colors.amber,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            pizza.rating.toStringAsFixed(1),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        pizza.tamanio,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -106,14 +104,14 @@ class PizzaCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      pizza.name,
+                      pizza.nombre,
                       style: Theme.of(context).textTheme.titleMedium,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      pizza.description,
+                      pizza.descripcion,
                       style: Theme.of(context).textTheme.bodySmall,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -123,16 +121,17 @@ class PizzaCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '\$${pizza.basePrice.toStringAsFixed(2)}',
+                          '\$${pizza.precioBase.toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
-                        Text(
-                          '${pizza.reviewCount} reseñas',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
+                        if (pizza.ingredientes.isNotEmpty)
+                          Text(
+                            '${pizza.ingredientes.length} ingredientes',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                       ],
                     ),
                   ],

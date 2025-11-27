@@ -60,7 +60,7 @@ class FlavorConfig {
   static final FlavorConfig _prod = FlavorConfig._(
     flavor: Flavor.prod,
     name: 'PROD',
-    apiBaseUrl: 'https://api.pizzasreyna.com/api/v1',
+    apiBaseUrl: 'https://localhost:8080/api',
     wsUrl: 'wss://api.pizzasreyna.com/ws',
     enableLogging: false,
   );

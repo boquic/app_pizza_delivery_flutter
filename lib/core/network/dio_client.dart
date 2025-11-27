@@ -12,7 +12,7 @@ class DioClient {
   DioClient({this.authStorage}) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: EnvConfig.apiBaseUrl,
+        baseUrl: EnvConfig.apiBaseUrlNormalized,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {

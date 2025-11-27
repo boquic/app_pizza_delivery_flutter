@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme/app_theme.dart';
+import 'features/auth/presentation/pages/login_page.dart';
 import 'features/catalog/presentation/pages/catalog_page.dart';
 import 'injection_container.dart';
 
@@ -18,9 +19,8 @@ void main() async {
     debugPrint('No se pudo cargar .env: $e');
   }
 
-  // Inicializar dependencias con datos mock
-  // Cambiar a false cuando la API esté disponible
-  await initDependencies(useMockData: true);
+  // Inicializar dependencias
+  await initDependencies();
 
   runApp(
     const ProviderScope(
@@ -38,7 +38,10 @@ class PizzasReynaApp extends StatelessWidget {
       title: 'Pizzas Reyna',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const CatalogPage(),
+      home: const LoginPage(),
+      routes: {
+        '/catalog': (context) => const CatalogPage(),
+      },
     );
   }
 }

@@ -1,13 +1,12 @@
 import '../../domain/entities/pizza.dart';
 import '../../domain/entities/pizza_category.dart';
 import '../../domain/repositories/pizza_repository.dart';
-import '../datasources/pizza_mock_datasource.dart';
 
-/// Implementación del repositorio de pizzas con datos mock
+/// Implementación mock del repositorio de pizzas (DEPRECADO)
+/// Este repositorio usa datos mock con campos antiguos
+/// Usar PizzaRepositoryImpl con PizzaApiDataSource en su lugar
 class PizzaRepositoryMockImpl implements PizzaRepository {
-  final PizzaMockDataSource _mockDataSource;
-
-  PizzaRepositoryMockImpl(this._mockDataSource);
+  PizzaRepositoryMockImpl();
 
   @override
   Future<List<Pizza>> getPizzas({
@@ -15,23 +14,18 @@ class PizzaRepositoryMockImpl implements PizzaRepository {
     required int limit,
     String? category,
   }) async {
-    final models = await _mockDataSource.getPizzas(
-      page: page,
-      limit: limit,
-      category: category,
-    );
-    return models.map((model) => model.toEntity()).toList();
+    // Retornar lista vacía - usar API real
+    return [];
   }
 
   @override
   Future<List<PizzaCategory>> getCategories() async {
-    final models = await _mockDataSource.getCategories();
-    return models.map((model) => model.toEntity()).toList();
+    // Retornar lista vacía - usar API real
+    return [];
   }
 
   @override
   Future<Pizza> getPizzaById(String id) async {
-    final model = await _mockDataSource.getPizzaById(id);
-    return model.toEntity();
+    throw UnimplementedError('Usar PizzaRepositoryImpl con API real');
   }
 }
