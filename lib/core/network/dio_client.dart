@@ -31,9 +31,13 @@ class DioClient {
             final token = authStorage!.getToken();
             if (token != null) {
               options.headers['Authorization'] = 'Bearer $token';
+              _logger.d('Added Auth Token: ${token.substring(0, 10)}...');
+            } else {
+              _logger.w('No Auth Token found in storage');
             }
           }
           _logger.d('REQUEST[${options.method}] => PATH: ${options.path}');
+          _logger.d('HEADERS: ${options.headers}');
           return handler.next(options);
         },
         onResponse: (response, handler) {

@@ -25,7 +25,7 @@ class PizzaCard extends StatelessWidget {
           children: [
             // Imagen de la pizza
             Expanded(
-              flex: 3,
+              flex: 1,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -97,7 +97,7 @@ class PizzaCard extends StatelessWidget {
             ),
             // Información de la pizza
             Expanded(
-              flex: 2,
+              flex: 1,
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
@@ -128,9 +128,12 @@ class PizzaCard extends StatelessWidget {
                               ),
                         ),
                         if (pizza.ingredientes.isNotEmpty)
-                          Text(
-                            '${pizza.ingredientes.length} ingredientes',
-                            style: Theme.of(context).textTheme.bodySmall,
+                          Flexible(
+                            child: Text(
+                              '${pizza.ingredientes.length} ingr.',
+                              style: Theme.of(context).textTheme.bodySmall,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                       ],
                     ),

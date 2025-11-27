@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -14,7 +15,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -26,8 +26,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
-
     try {
       await ref.read(authProvider.notifier).login(
             _emailController.text.trim(),
@@ -35,26 +33,37 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           );
 
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/catalog');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('¡Bienvenido!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        
+        // Navegar manualmente ya que el redirect puede no dispararse inmediatamente
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/catalog');
+        }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red,
           ),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -180,6 +189,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
+                              onFieldSubmitted: (_) => _handleLogin(),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Por favor ingresa tu contraseña';
@@ -197,7 +207,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
-                                onPressed: _isLoading ? null : _handleLogin,
+                                onPressed: authState.isLoading ? null : _handleLogin,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.orange,
                                   foregroundColor: Colors.white,
@@ -206,7 +216,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   ),
                                   elevation: 4,
                                 ),
-                                child: _isLoading
+                                child: authState.isLoading
                                     ? const SizedBox(
                                         height: 24,
                                         width: 24,
@@ -223,6 +233,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         ),
                                       ),
                               ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Link a Registro
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('¿No tienes cuenta? '),
+                                TextButton(
+                                  onPressed: () => context.go('/register'),
+                                  child: const Text(
+                                    'Regístrate',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

@@ -115,8 +115,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
-    await _authStorage.clearAll();
-    state = AuthState();
+    try {
+      await _authStorage.clearAll();
+    } catch (e) {
+      // Ignorar errores de limpieza de almacenamiento
+    } finally {
+      state = AuthState();
+    }
   }
 }
 

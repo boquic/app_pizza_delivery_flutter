@@ -14,11 +14,11 @@ PizzaRepository pizzaRepository(PizzaRepositoryRef ref) {
   return getIt<PizzaRepository>();
 }
 
-/// Provider para obtener categorías
+/// Provider para obtener categorías (mock temporal)
 @riverpod
 Future<List<PizzaCategory>> pizzaCategories(PizzaCategoriesRef ref) async {
-  final repository = ref.watch(pizzaRepositoryProvider);
-  return repository.getCategories();
+  // Retornar lista vacía temporalmente hasta implementar categorías
+  return [];
 }
 
 /// Estado del catálogo de pizzas
@@ -69,9 +69,9 @@ class PizzaCatalog extends _$PizzaCatalog {
     return PizzaCatalogState();
   }
 
-  /// Carga pizzas con paginación
+  /// Carga pizzas (sin paginación por ahora)
   Future<void> loadPizzas() async {
-    if (state.isLoading || !state.hasMore) {
+    if (state.isLoading) {
       return;
     }
 
@@ -79,17 +79,17 @@ class PizzaCatalog extends _$PizzaCatalog {
 
     try {
       final repository = ref.read(pizzaRepositoryProvider);
-      final newPizzas = await repository.getPizzas(
-        page: state.currentPage,
-        limit: _pageSize,
+      final allPizzas = await repository.getPizzas(
+        page: 1,
+        limit: 100,
         category: state.selectedCategory,
       );
 
       state = state.copyWith(
-        pizzas: [...state.pizzas, ...newPizzas],
+        pizzas: allPizzas,
         isLoading: false,
-        hasMore: newPizzas.length == _pageSize,
-        currentPage: state.currentPage + 1,
+        hasMore: false,
+        currentPage: 1,
       );
     } on Exception catch (e) {
       state = state.copyWith(

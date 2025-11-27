@@ -7,6 +7,7 @@ abstract class CartRemoteDataSource {
   Future<CarritoModel> getCarrito();
   Future<CarritoModel> agregarItem(AgregarItemRequestModel request);
   Future<void> limpiarCarrito();
+  Future<CarritoModel> eliminarItem(int itemId);
 }
 
 class CartRemoteDataSourceImpl implements CartRemoteDataSource {
@@ -31,6 +32,16 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
         '/api/usuario/carrito/agregar',
         data: request.toJson(),
       );
+      return CarritoModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  @override
+  Future<CarritoModel> eliminarItem(int itemId) async {
+    try {
+      final response = await dioClient.dio.delete('/api/usuario/carrito/items/$itemId');
       return CarritoModel.fromJson(response.data);
     } on DioException catch (e) {
       throw _handleError(e);

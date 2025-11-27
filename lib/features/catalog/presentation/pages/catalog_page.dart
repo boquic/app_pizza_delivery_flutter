@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/constants/app_colors.dart';
+import '../../../auth/presentation/pages/login_page.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../cart/presentation/pages/cart_page.dart';
+import '../../../cart/presentation/providers/cart_provider.dart';
 import '../providers/pizza_providers.dart';
-import '../widgets/pizza_card.dart';
 import '../widgets/category_filter.dart';
+import '../widgets/pizza_card.dart';
 import '../widgets/pizza_grid_shimmer.dart';
+import 'pizza_detail_page.dart';
 
 /// Página principal del catálogo de pizzas
 class CatalogPage extends ConsumerStatefulWidget {
@@ -48,15 +54,13 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // TODO: Implementar búsqueda
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Búsqueda próximamente')),
+              );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined),
-            onPressed: () {
-              // TODO: Navegar al carrito
-            },
-          ),
+          _buildCartButton(),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
@@ -110,7 +114,14 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
                         return PizzaCard(
                           pizza: pizza,
                           onTap: () {
-                            // TODO: Navegar a detalle de pizza
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PizzaDetailPage(
+                                  pizzaId: pizza.id,
+                                ),
+                              ),
+                            );
                           },
                         );
                       },
@@ -152,5 +163,87 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
     if (width > 1200) return 4;
     if (width > 800) return 3;
     return 2;
+  }
+
+  Widget _buildCartButton() {
+    final authState = ref.watch(authProvider);
+    final cartState = ref.watch(cartProvider);
+
+    return Stack(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.shopping_cart_outlined),
+          onPressed: () => _handleCartNavigation(authState),
+        ),
+        if (authState.isAuthenticated && cartState.itemCount > 0)
+          Positioned(
+            right: 8,
+            top: 8,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: AppColors.error,
+                shape: BoxShape.circle,
+              ),
+              constraints: const BoxConstraints(
+                minWidth: 16,
+                minHeight: 16,
+              ),
+              child: Text(
+                '${cartState.itemCount}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _handleCartNavigation(AuthState authState) {
+    if (!authState.isAuthenticated) {
+      _showLoginRequiredDialog();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CartPage(),
+        ),
+      );
+    }
+  }
+
+  void _showLoginRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Inicia sesión'),
+        content: const Text(
+          'Necesitas iniciar sesión para ver tu carrito y realizar pedidos.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginPage(),
+                ),
+              );
+            },
+            child: const Text('Iniciar sesión'),
+          ),
+        ],
+      ),
+    );
   }
 }

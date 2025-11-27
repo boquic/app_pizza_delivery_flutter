@@ -31,13 +31,13 @@ class PizzaGridShimmer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 3,
+                  flex: 1,
                   child: Container(
                     color: AppColors.surfaceVariant,
                   ),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Column(
@@ -48,7 +48,7 @@ class PizzaGridShimmer extends StatelessWidget {
                           height: 16,
                           color: AppColors.surfaceVariant,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Container(
                           width: double.infinity,
                           height: 12,
@@ -70,7 +70,7 @@ class PizzaGridShimmer extends StatelessWidget {
                               color: AppColors.surfaceVariant,
                             ),
                             Container(
-                              width: 80,
+                              width: 60,
                               height: 12,
                               color: AppColors.surfaceVariant,
                             ),
